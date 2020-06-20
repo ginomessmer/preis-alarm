@@ -19,6 +19,7 @@ namespace PreisAlarm.Worker
         private readonly EdekaReader _edekaReader;
         private readonly LiteDatabase _liteDatabase;
         private readonly DiscordSocketClient _discordSocketClient;
+        private readonly CommandHandler _commandHandler;
         private readonly IConfiguration _configuration;
 
         public const string PforzheimMarketId = "1160950";
@@ -29,18 +30,21 @@ namespace PreisAlarm.Worker
             EdekaReader edekaReader,
             LiteDatabase liteDatabase,
             DiscordSocketClient discordSocketClient,
+            CommandHandler commandHandler,
             IConfiguration configuration)
         {
             _logger = logger;
             _edekaReader = edekaReader;
             _liteDatabase = liteDatabase;
             _discordSocketClient = discordSocketClient;
+            _commandHandler = commandHandler;
             _configuration = configuration;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             await StartDiscordClientAsync();
+            await _commandHandler.InitializeAsync();
             SeedKeywords();
                 
             while (!stoppingToken.IsCancellationRequested)

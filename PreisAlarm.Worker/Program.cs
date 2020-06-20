@@ -1,6 +1,6 @@
-using System;
 using System.Linq;
 using System.Web;
+using Discord.Commands;
 using Discord.WebSocket;
 using LiteDB;
 using Microsoft.Extensions.Configuration;
@@ -25,6 +25,9 @@ namespace PreisAlarm.Worker
                     services.AddSingleton<EdekaReader>();
 
                     services.AddSingleton<DiscordSocketClient>(x => new DiscordSocketClient());
+                    services.AddSingleton<CommandService>(x => new CommandService());
+
+                    services.AddSingleton<CommandHandler>();
 
                     services.AddHostedService<Worker>();
                 });

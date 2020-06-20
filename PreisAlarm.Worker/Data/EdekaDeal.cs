@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace PreisAlarm.Worker.Data
 {
@@ -34,7 +35,7 @@ namespace PreisAlarm.Worker.Data
         public Uri BildApp { get; set; }
 
         [JsonProperty("warengruppe")]
-        public string Warengruppe { get; set; }
+        public string Category { get; set; }
 
         [JsonProperty("warengruppeid")]
         public long Warengruppeid { get; set; }
@@ -54,7 +55,7 @@ namespace PreisAlarm.Worker.Data
         [JsonProperty("national")]
         public bool National { get; set; }
 
-        [JsonProperty("gueltig_bis")]
-        public long ValidUntil { get; set; }
+        //[JsonProperty("gueltig_bis")]
+        //public long ValidUntil { get; set; }
     }
 }
