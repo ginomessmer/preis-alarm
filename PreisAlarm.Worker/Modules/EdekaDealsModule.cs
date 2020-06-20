@@ -28,7 +28,17 @@ namespace PreisAlarm.Worker.Modules
         public async Task CurrentDealsCommandAsync(string marketId = "1160950")
         {
             var deals = await _edekaReader.GetCurrentDealsAsync(marketId);
-            var favoriteDeals = deals.Where(x => FavoriteKeywords.Any(y => x.Title.Contains(y.Text))).ToList();
+            var favoriteDeals = deals
+                .Where(x => FavoriteKeywords
+                    .Any(y => x.Title.Contains(y.Text) && y.Creator == Context.User.Id.ToString()))
+                .OrderBy(x => x.Price)
+                .ToList();
+
+            if (!favoriteDeals.Any())
+            {
+                await ReplyAsync("I didn't found any deals :(");
+                return;
+            }
 
             foreach (var deal in favoriteDeals)
             {
@@ -45,7 +55,7 @@ namespace PreisAlarm.Worker.Modules
                             .WithIsInline(true),
                         new EmbedFieldBuilder()
                             .WithName("Basic Price")
-                            .WithValue(deal.BasicPrice)
+                            .WithValue(deal.BasicPrice ?? "-")
                             .WithIsInline(true),
                         new EmbedFieldBuilder()
                             .WithName("Category")
