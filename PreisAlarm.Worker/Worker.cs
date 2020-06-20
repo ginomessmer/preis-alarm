@@ -13,7 +13,11 @@ namespace PreisAlarm.Worker
         private readonly ILogger<Worker> _logger;
         private readonly EdekaReader _edekaReader;
 
-        public const string pforzheimMarketId = "1160950";
+        public const string PforzheimMarketId = "1160950";
+        public IList<string> FavoriteKeywords = new List<string>
+        {
+            "Nüsse", "Eis", "TropiFrutti", "Studentenfutter"
+        };
 
         public Worker(ILogger<Worker> logger, EdekaReader edekaReader)
         {
@@ -25,13 +29,14 @@ namespace PreisAlarm.Worker
         {
             while (!stoppingToken.IsCancellationRequested)
             {
-                var deals = await _edekaReader.GetCurrentDealsAsync(pforzheimMarketId);
+                var deals = await _edekaReader.GetCurrentDealsAsync(PforzheimMarketId);
+                deals = deals.Where(x => FavoriteKeywords.Any(y => x.Title.Contains(y))).ToList();
 
                 Console.WriteLine($"Found {deals.Count} deals");
                 foreach (var edekaDeal in deals)
                 {
                     Console.WriteLine(edekaDeal.Title);
-                    Console.WriteLine("Price: {0} - Original Price: {1}", edekaDeal.Price, edekaDeal.BasicPrice);
+                    Console.WriteLine("Price: {0} - Basic Price: {1}", edekaDeal.Price, edekaDeal.BasicPrice);
                     Console.WriteLine("============================");
                 }
 
