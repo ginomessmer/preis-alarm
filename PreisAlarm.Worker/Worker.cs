@@ -45,7 +45,6 @@ namespace PreisAlarm.Worker
         {
             await StartDiscordClientAsync();
             await _commandHandler.InitializeAsync();
-            SeedKeywords();
                 
             while (!stoppingToken.IsCancellationRequested)
             {
@@ -74,22 +73,6 @@ namespace PreisAlarm.Worker
                 await _discordSocketClient.SetActivityAsync(new Game( "Sieben sieben ay lulu, eins zwei",
                     ActivityType.Listening));
             };
-        }
-
-        private void SeedKeywords()
-        {
-            var existsAnyFavoriteKeywords = _liteDatabase.GetCollection<FavoriteKeyword>().Count() > 0;
-
-            if (existsAnyFavoriteKeywords)
-                return;
-            
-            _liteDatabase.GetCollection<FavoriteKeyword>().InsertBulk(new List<FavoriteKeyword>
-            {
-                new FavoriteKeyword {Text = "Nüsse"},
-                new FavoriteKeyword {Text = "Eis"},
-                new FavoriteKeyword {Text = "TropiFrutti"},
-                new FavoriteKeyword {Text = "Studentenfutter"}
-            });
         }
     }
 }
