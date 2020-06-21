@@ -8,10 +8,10 @@ namespace PreisAlarm.Worker.Data
     public class EdekaDeal
     {
         [JsonProperty("angebotid")]
-        public long Id { get; set; }
+        public string Id { get; set; }
 
         [JsonProperty("externeid")]
-        public object ExternalId { get; set; }
+        public string ExternalId { get; set; }
 
         [JsonProperty("titel")]
         public string Title { get; set; }

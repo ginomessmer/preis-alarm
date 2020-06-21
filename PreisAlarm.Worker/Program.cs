@@ -6,6 +6,8 @@ using LiteDB;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using PreisAlarm.Worker.Readers;
+using PreisAlarm.Worker.Services;
 
 namespace PreisAlarm.Worker
 {
@@ -22,6 +24,7 @@ namespace PreisAlarm.Worker
                 .ConfigureServices((hostContext, services) =>
                 {
                     services.AddSingleton<LiteDatabase>(x => new LiteDatabase("data.db"));
+                    services.AddSingleton<IUserService, LiteDbUserService>();
                     services.AddSingleton<EdekaReader>();
 
                     services.AddSingleton<DiscordSocketClient>(x => new DiscordSocketClient());

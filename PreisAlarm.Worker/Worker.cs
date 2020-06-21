@@ -10,6 +10,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using PreisAlarm.Worker.Data;
+using PreisAlarm.Worker.Readers;
+using PreisAlarm.Worker.Services;
 
 namespace PreisAlarm.Worker
 {
@@ -51,12 +53,6 @@ namespace PreisAlarm.Worker
         {
             await _discordSocketClient.LoginAsync(TokenType.Bot, _configuration.GetConnectionString("DiscordBotToken"));
             await _discordSocketClient.StartAsync();
-
-            _discordSocketClient.Ready += async () =>
-            {
-                await _discordSocketClient.SetActivityAsync(new Game( "Sieben sieben ay lulu, eins zwei",
-                    ActivityType.Listening));
-            };
         }
     }
 }
