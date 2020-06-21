@@ -1,22 +1,27 @@
 using System;
 using System.Reflection;
 using System.Threading.Tasks;
+using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using Microsoft.Extensions.Logging;
 
-namespace PreisAlarm.Worker
+namespace PreisAlarm.Worker.Services
 {
     public class CommandHandler
     {
         private readonly DiscordSocketClient _client;
+        private readonly ILogger<CommandHandler> _logger;
         private readonly CommandService _commands;
         private readonly IServiceProvider _services;
 
-        public CommandHandler(IServiceProvider services, CommandService commands, DiscordSocketClient client)
+        public CommandHandler(IServiceProvider services, CommandService commands, DiscordSocketClient client, 
+            ILogger<CommandHandler> logger)
         {
             _commands = commands;
             _services = services;
             _client = client;
+            _logger = logger;
         }
 
         public async Task InitializeAsync()
@@ -24,9 +29,7 @@ namespace PreisAlarm.Worker
             // Pass the service provider to the second parameter of
             // AddModulesAsync to inject dependencies to all modules 
             // that may require them.
-            await _commands.AddModulesAsync(
-                assembly: Assembly.GetEntryAssembly(),
-                services: _services);
+            await _commands.AddModulesAsync(Assembly.GetEntryAssembly(), _services);
             _client.MessageReceived += HandleCommandAsync;
         }
 
@@ -53,17 +56,14 @@ namespace PreisAlarm.Worker
 
             // Keep in mind that result does not indicate a return value
             // rather an object stating if the command executed successfully.
-            var result = await _commands.ExecuteAsync(
-                context: context,
-                argPos: argPos,
-                services: _services);
+            var result = await _commands.ExecuteAsync(context, argPos, _services);
 
             // Optionally, we may inform the user if the command fails
             // to be executed; however, this may not always be desired,
             // as it may clog up the request queue should a user spam a
             // command.
-            // if (!result.IsSuccess)
-            // await context.Channel.SendMessageAsync(result.ErrorReason);
+            if (!result.IsSuccess)
+                await context.Channel.SendMessageAsync(result.ErrorReason);
         }
     }
 }

@@ -7,6 +7,8 @@ using Discord;
 using Discord.Commands;
 using LiteDB;
 using PreisAlarm.Worker.Data;
+using PreisAlarm.Worker.Readers;
+using PreisAlarm.Worker.Services;
 
 namespace PreisAlarm.Worker.Modules
 {
@@ -14,17 +16,12 @@ namespace PreisAlarm.Worker.Modules
     public class EdekaModule : ModuleBase<SocketCommandContext>
     {
         private readonly EdekaReader _edekaReader;
-        private readonly LiteDatabase _liteDatabase;
+        private readonly IUserService _userService;
 
-        public IEnumerable<FavoriteKeyword> FavoriteKeywords =>
-            _liteDatabase.GetCollection<FavoriteKeyword>().FindAll();
-
-        public ILiteCollection<BotUser> BotUsers => _liteDatabase.GetCollection<BotUser>();
-
-        public EdekaModule(EdekaReader edekaReader, LiteDatabase liteDatabase)
+        public EdekaModule(EdekaReader edekaReader, IUserService userService)
         {
             _edekaReader = edekaReader;
-            _liteDatabase = liteDatabase;
+            _userService = userService;
         }
 
         [Command("markets"), Alias("m")]
@@ -48,27 +45,20 @@ namespace PreisAlarm.Worker.Modules
         [Command("set marketId")]
         public async Task SetMarketIdCommandAsync(string marketId)
         {
-            var userId = Context.User.Id.ToString();
-            var exists = BotUsers.Exists(x => x.Id == userId);
+            var botUser = await _userService.GetUserAsync(Context.User.Id.ToString());
 
-            var user = new BotUser(userId);
-            if (exists)
-                user = BotUsers.FindById(userId);
-            else
-                BotUsers.Insert(user);
+            botUser.PreferredEdekaMarketId = marketId;
 
-            user.EdekaMarketId = marketId;
-
-            BotUsers.Update(user);
+            await _userService.UpdateUserAsync(botUser);
             await ReplyAsync("Änderung übernommen.");
         }
 
         [Command("deals"), Alias("d")]
         public async Task CurrentDealsCommandAsync()
         {
-            var user = BotUsers.FindById(Context.User.Id.ToString());
+            var botUser = await _userService.GetUserAsync(Context.User.Id.ToString());
 
-            if (user is null)
+            if (string.IsNullOrEmpty(botUser.PreferredEdekaMarketId))
             {
                 await ReplyAsync("Du musst zuerst deinen präferierten Edeka Markt setzen. " +
                                  "Suche dazu mit `edeka markets <suchbegriff>` deinen Lieblingsmarke " +
@@ -76,10 +66,18 @@ namespace PreisAlarm.Worker.Modules
                 return;
             }
 
-            var deals = await _edekaReader.GetCurrentDealsAsync(user.EdekaMarketId);
+            if (!botUser.FavoriteKeywords.Any())
+            {
+                await ReplyAsync("Bevor ich deine Angebote finden kann, " +
+                                 "musst du mir ein paar Stichworte zu deinen Lieblingsprodukten " +
+                                 "eingeben: `kw+ <stichwort1> [<stichwort2> ...]`. Versuche es dann erneut.");
+                return;
+            }
+
+            var deals = await _edekaReader.GetCurrentDealsAsync(botUser.PreferredEdekaMarketId);
             var favoriteDeals = deals
-                .Where(x => FavoriteKeywords
-                    .Any(y => x.Title.Contains(y.Text) && y.Creator == Context.User.Id.ToString()))
+                .Where(x => botUser.FavoriteKeywords
+                    .Any(y => x.Title.Contains(y.Text)))
                 .OrderBy(x => x.Price)
                 .ToList();
 
