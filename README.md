@@ -1,5 +1,4 @@
-> **⚠ WIP. Ich entwickelte den Bot um 3 Uhr nachts aus Langeweile. Momentan noch "quick and dirty", aber er funktioniert als POC**.
-
+![](https://img.shields.io/badge/%E2%9A%A0-WIP-orange)
 ![.NET Core](https://github.com/ginomessmer/preis-alarm/workflows/.NET%20Core/badge.svg)
 ![Docker Image CI](https://github.com/ginomessmer/preis-alarm/workflows/Docker%20Image%20CI/badge.svg)
 [![](https://img.shields.io/docker/cloud/automated/ginomessmer/preis-alarm)](https://hub.docker.com/r/ginomessmer/preis-alarm)
