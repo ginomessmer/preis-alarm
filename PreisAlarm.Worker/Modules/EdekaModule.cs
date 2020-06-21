@@ -10,6 +10,7 @@ using PreisAlarm.Worker.Data;
 
 namespace PreisAlarm.Worker.Modules
 {
+    [Group("edeka"), Alias("edk")]
     public class EdekaModule : ModuleBase<SocketCommandContext>
     {
         private readonly EdekaReader _edekaReader;
@@ -24,6 +25,23 @@ namespace PreisAlarm.Worker.Modules
         {
             _edekaReader = edekaReader;
             _liteDatabase = liteDatabase;
+        }
+
+        [Command("markets")]
+        public async Task FindMarketsCommandAsync([Remainder] string term)
+        {
+            var markets = await _edekaReader.GetNearbyMarketsAsync(term);
+
+            var embed = new EmbedBuilder()
+                .WithDescription("Hier ist eine Liste aller Märkte und ihrer ID in der Nähe")
+                .WithFields(markets
+                    .Select(x => new EmbedFieldBuilder()
+                        .WithName(x.Name)
+                        .WithValue($"`{x.Id}`")
+                        .WithIsInline(true)))
+                .Build();
+
+            await ReplyAsync(embed: embed);
         }
 
         [Command("set marketId")]
@@ -44,7 +62,7 @@ namespace PreisAlarm.Worker.Modules
             await ReplyAsync("Changed saved.");
         }
 
-        [Command("deals")]
+        [Command("deals"), Alias("d")]
         public async Task CurrentDealsCommandAsync()
         {
             var user = BotUsers.FindById(Context.User.Id.ToString());
