@@ -10,7 +10,8 @@ using PreisAlarm.Worker.Data;
 
 namespace PreisAlarm.Worker.Modules
 {
-    public class EdekaDealsModule : ModuleBase<SocketCommandContext>
+    [Group("edeka"), Alias("edk")]
+    public class EdekaModule : ModuleBase<SocketCommandContext>
     {
         private readonly EdekaReader _edekaReader;
         private readonly LiteDatabase _liteDatabase;
@@ -20,10 +21,28 @@ namespace PreisAlarm.Worker.Modules
 
         public ILiteCollection<BotUser> BotUsers => _liteDatabase.GetCollection<BotUser>();
 
-        public EdekaDealsModule(EdekaReader edekaReader, LiteDatabase liteDatabase)
+        public EdekaModule(EdekaReader edekaReader, LiteDatabase liteDatabase)
         {
             _edekaReader = edekaReader;
             _liteDatabase = liteDatabase;
+        }
+
+        [Command("markets"), Alias("m")]
+        public async Task FindMarketsCommandAsync([Remainder] string term)
+        {
+            var markets = await _edekaReader.GetNearbyMarketsAsync(term);
+
+            var embed = new EmbedBuilder()
+                .WithTitle("Marktsuche")
+                .WithDescription($"Hier ist eine Liste aller Märkte und ihrer ID in der Nähe von `{term}`")
+                .WithFields(markets
+                    .Select(x => new EmbedFieldBuilder()
+                        .WithName(x.Name)
+                        .WithValue($"`{x.Id}`")
+                        .WithIsInline(true)))
+                .Build();
+
+            await ReplyAsync(embed: embed);
         }
 
         [Command("set marketId")]
@@ -41,17 +60,19 @@ namespace PreisAlarm.Worker.Modules
             user.EdekaMarketId = marketId;
 
             BotUsers.Update(user);
-            await ReplyAsync("Changed saved.");
+            await ReplyAsync("Änderung übernommen.");
         }
 
-        [Command("deals")]
+        [Command("deals"), Alias("d")]
         public async Task CurrentDealsCommandAsync()
         {
             var user = BotUsers.FindById(Context.User.Id.ToString());
 
             if (user is null)
             {
-                await ReplyAsync("You need to set your preferred market ID first: `set marketId <id>`");
+                await ReplyAsync("Du musst zuerst deinen präferierten Edeka Markt setzen. " +
+                                 "Suche dazu mit `edeka markets <suchbegriff>` deinen Lieblingsmarke " +
+                                 "und setze diesen dann mit `edeka set marketId <id>` fest.");
                 return;
             }
 
@@ -64,7 +85,7 @@ namespace PreisAlarm.Worker.Modules
 
             if (!favoriteDeals.Any())
             {
-                await ReplyAsync("I didn't found any deals :(");
+                await ReplyAsync("Ich konnte keine Angebote finden :(");
                 return;
             }
 
