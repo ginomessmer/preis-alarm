@@ -63,13 +63,7 @@ namespace PreisAlarm.Worker.Services
             // as it may clog up the request queue should a user spam a
             // command.
             if (!result.IsSuccess)
-            {
-                var errorId = Guid.NewGuid().ToString();
-                var errorMessage = $"{result.ErrorReason} (#{errorId})";
-
-                _logger.LogError(errorMessage);
-                await context.Channel.SendMessageAsync($"Ein unbekannter Fehler trat auf (Error ID: `{errorId}`).");
-            }
+                await context.Channel.SendMessageAsync(result.ErrorReason);
         }
     }
 }

@@ -6,7 +6,7 @@ namespace PreisAlarm.Worker.Data
     {
         public string Id { get; set; }
 
-        public string EdekaMarketId { get; set; }
+        public string PreferredEdekaMarketId { get; set; }
 
         public ICollection<FavoriteKeyword> FavoriteKeywords { get; set; } = new List<FavoriteKeyword>();
 

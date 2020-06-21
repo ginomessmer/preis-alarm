@@ -19,9 +19,9 @@ namespace PreisAlarm.Worker.Modules
 
         [Command("keywords")]
         [Alias("kw")]
-        public async Task ListAllFavoriteKeywordsCommandAsync(SocketGuildUser user)
+        public async Task ListAllFavoriteKeywordsCommandAsync()
         {
-            var botUser = await _userService.GetUserAsync(user.Id.ToString());
+            var botUser = await _userService.GetUserAsync(Context.User.Id.ToString());
             var keywords = botUser.FavoriteKeywords;
 
             if (!keywords.Any())
@@ -38,12 +38,12 @@ namespace PreisAlarm.Worker.Modules
         public async Task AddFavoriteKeywordCommandAsync(params string[] keywords)
         {
             var botUser = await _userService.GetUserAsync(Context.User.Id.ToString());
+
             foreach (var keyword in keywords)
             {
                 botUser.FavoriteKeywords.Add(new FavoriteKeyword
                 {
-                    Text = keyword,
-                    Creator = Context.User.Id.ToString()
+                    Text = keyword
                 });
             }
 
