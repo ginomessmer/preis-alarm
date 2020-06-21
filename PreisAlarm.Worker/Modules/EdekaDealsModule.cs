@@ -18,16 +18,44 @@ namespace PreisAlarm.Worker.Modules
         public IEnumerable<FavoriteKeyword> FavoriteKeywords =>
             _liteDatabase.GetCollection<FavoriteKeyword>().FindAll();
 
+        public ILiteCollection<BotUser> BotUsers => _liteDatabase.GetCollection<BotUser>();
+
         public EdekaDealsModule(EdekaReader edekaReader, LiteDatabase liteDatabase)
         {
             _edekaReader = edekaReader;
             _liteDatabase = liteDatabase;
         }
 
-        [Command("deals")]
-        public async Task CurrentDealsCommandAsync(string marketId = "1160950")
+        [Command("set marketId")]
+        public async Task SetMarketIdCommandAsync(string marketId)
         {
-            var deals = await _edekaReader.GetCurrentDealsAsync(marketId);
+            var userId = Context.User.Id.ToString();
+            var exists = BotUsers.Exists(x => x.Id == userId);
+
+            var user = new BotUser(userId);
+            if (exists)
+                user = BotUsers.FindById(userId);
+            else
+                BotUsers.Insert(user);
+
+            user.EdekaMarketId = marketId;
+
+            BotUsers.Update(user);
+            await ReplyAsync("Changed saved.");
+        }
+
+        [Command("deals")]
+        public async Task CurrentDealsCommandAsync()
+        {
+            var user = BotUsers.FindById(Context.User.Id.ToString());
+
+            if (user is null)
+            {
+                await ReplyAsync("You need to set your preferred market ID first: `set marketId <id>`");
+                return;
+            }
+
+            var deals = await _edekaReader.GetCurrentDealsAsync(user.EdekaMarketId);
             var favoriteDeals = deals
                 .Where(x => FavoriteKeywords
                     .Any(y => x.Title.Contains(y.Text) && y.Creator == Context.User.Id.ToString()))
