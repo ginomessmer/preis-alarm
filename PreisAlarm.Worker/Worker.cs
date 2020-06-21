@@ -10,6 +10,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using PreisAlarm.Worker.Data;
+using PreisAlarm.Worker.Readers;
+using PreisAlarm.Worker.Services;
 
 namespace PreisAlarm.Worker
 {

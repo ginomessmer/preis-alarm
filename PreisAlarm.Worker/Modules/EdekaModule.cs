@@ -7,6 +7,7 @@ using Discord;
 using Discord.Commands;
 using LiteDB;
 using PreisAlarm.Worker.Data;
+using PreisAlarm.Worker.Readers;
 
 namespace PreisAlarm.Worker.Modules
 {

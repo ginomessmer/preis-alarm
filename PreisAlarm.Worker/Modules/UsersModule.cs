@@ -7,12 +7,12 @@ using PreisAlarm.Worker.Data;
 
 namespace PreisAlarm.Worker.Modules
 {
-    public class FavoriteKeywordsModule : ModuleBase<SocketCommandContext>
+    public class UsersModule : ModuleBase<SocketCommandContext>
     {
         private readonly LiteDatabase _liteDatabase;
         public ILiteCollection<FavoriteKeyword> FavoriteKeywords => _liteDatabase.GetCollection<FavoriteKeyword>();
 
-        public FavoriteKeywordsModule(LiteDatabase liteDatabase)
+        public UsersModule(LiteDatabase liteDatabase)
         {
             _liteDatabase = liteDatabase;
         }

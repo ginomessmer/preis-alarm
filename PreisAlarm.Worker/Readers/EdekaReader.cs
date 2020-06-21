@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using PreisAlarm.Worker.Data;
 
-namespace PreisAlarm.Worker
+namespace PreisAlarm.Worker.Readers
 {
     public class EdekaReader
     {

@@ -6,6 +6,8 @@ using LiteDB;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using PreisAlarm.Worker.Readers;
+using PreisAlarm.Worker.Services;
 
 namespace PreisAlarm.Worker
 {
