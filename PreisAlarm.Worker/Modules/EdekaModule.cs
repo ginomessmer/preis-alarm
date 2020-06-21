@@ -85,7 +85,7 @@ namespace PreisAlarm.Worker.Modules
 
             if (!favoriteDeals.Any())
             {
-                await ReplyAsync("I didn't found any deals :(");
+                await ReplyAsync("Ich konnte keine Angebote finden :(");
                 return;
             }
 
