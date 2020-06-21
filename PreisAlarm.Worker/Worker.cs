@@ -54,10 +54,10 @@ namespace PreisAlarm.Worker
             await _discordSocketClient.LoginAsync(TokenType.Bot, _configuration.GetConnectionString("DiscordBotToken"));
             await _discordSocketClient.StartAsync();
 
-            _discordSocketClient.Ready += async () =>
+            _discordSocketClient.Ready += () =>
             {
-                await _discordSocketClient.SetActivityAsync(new Game( "Sieben sieben ay lulu, eins zwei",
-                    ActivityType.Listening));
+                //await _discordSocketClient.SetActivityAsync(new Game( "Sieben sieben ay lulu, eins zwei",
+                //    ActivityType.Listening));
             };
         }
     }
