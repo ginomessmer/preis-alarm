@@ -1,8 +1,7 @@
-> Der Preis ist heiß
+> **⚠ WIP. Very quick and dirty for now**.
 
 # Preis Alarm
-
-⚠ WIP. **Very quick and dirty for now**.
+Der Preis ist heiß. Ein Discord-Bot, der deine Lieblingsangebote in deinem Edeka um die Ecke ausspuckt.
 
 ## Konfiguration
 - `ConnectionStrings:DiscordBotToken`: Discord Bot Token (https://discord.com/developers/)
