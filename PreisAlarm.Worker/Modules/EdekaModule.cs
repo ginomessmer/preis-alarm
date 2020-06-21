@@ -10,7 +10,7 @@ using PreisAlarm.Worker.Data;
 
 namespace PreisAlarm.Worker.Modules
 {
-    public class EdekaDealsModule : ModuleBase<SocketCommandContext>
+    public class EdekaModule : ModuleBase<SocketCommandContext>
     {
         private readonly EdekaReader _edekaReader;
         private readonly LiteDatabase _liteDatabase;
@@ -20,7 +20,7 @@ namespace PreisAlarm.Worker.Modules
 
         public ILiteCollection<BotUser> BotUsers => _liteDatabase.GetCollection<BotUser>();
 
-        public EdekaDealsModule(EdekaReader edekaReader, LiteDatabase liteDatabase)
+        public EdekaModule(EdekaReader edekaReader, LiteDatabase liteDatabase)
         {
             _edekaReader = edekaReader;
             _liteDatabase = liteDatabase;
