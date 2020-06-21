@@ -45,22 +45,6 @@ namespace PreisAlarm.Worker
         {
             await StartDiscordClientAsync();
             await _commandHandler.InitializeAsync();
-                
-            while (!stoppingToken.IsCancellationRequested)
-            {
-                var deals = await _edekaReader.GetCurrentDealsAsync(PforzheimMarketId);
-                deals = deals.Where(x => FavoriteKeywords.Any(y => x.Title.Contains(y.Text))).ToList();
-
-                Console.WriteLine($"Found {deals.Count} deals");
-                foreach (var edekaDeal in deals)
-                {
-                    Console.WriteLine(edekaDeal.Title);
-                    Console.WriteLine("Price: {0} - Basic Price: {1}", edekaDeal.Price, edekaDeal.BasicPrice);
-                    Console.WriteLine("============================");
-                }
-
-                await Task.Delay(10000, stoppingToken);
-            }
         }
 
         private async Task StartDiscordClientAsync()
