@@ -27,13 +27,14 @@ namespace PreisAlarm.Worker.Modules
             _liteDatabase = liteDatabase;
         }
 
-        [Command("markets")]
+        [Command("markets"), Alias("m")]
         public async Task FindMarketsCommandAsync([Remainder] string term)
         {
             var markets = await _edekaReader.GetNearbyMarketsAsync(term);
 
             var embed = new EmbedBuilder()
-                .WithDescription("Hier ist eine Liste aller Märkte und ihrer ID in der Nähe")
+                .WithTitle("Marktsuche")
+                .WithDescription($"Hier ist eine Liste aller Märkte und ihrer ID in der Nähe von `{term}`")
                 .WithFields(markets
                     .Select(x => new EmbedFieldBuilder()
                         .WithName(x.Name)
@@ -59,7 +60,7 @@ namespace PreisAlarm.Worker.Modules
             user.EdekaMarketId = marketId;
 
             BotUsers.Update(user);
-            await ReplyAsync("Changed saved.");
+            await ReplyAsync("Änderung übernommen.");
         }
 
         [Command("deals"), Alias("d")]
@@ -69,7 +70,9 @@ namespace PreisAlarm.Worker.Modules
 
             if (user is null)
             {
-                await ReplyAsync("You need to set your preferred market ID first: `set marketId <id>`");
+                await ReplyAsync("Du musst zuerst deinen präferierten Edeka Markt setzen. " +
+                                 "Suche dazu mit `edeka markets <suchbegriff>` deinen Lieblingsmarke " +
+                                 "und setze diesen dann mit `edeka set marketId <id>` fest.");
                 return;
             }
 
