@@ -1,10 +1,14 @@
-﻿namespace PreisAlarm.Worker.Data
+﻿using System.Collections.Generic;
+
+namespace PreisAlarm.Worker.Data
 {
     public class BotUser
     {
         public string Id { get; set; }
 
         public string EdekaMarketId { get; set; }
+
+        public ICollection<FavoriteKeyword> FavoriteKeywords { get; set; } = new List<FavoriteKeyword>();
 
         public BotUser(string id)
         {

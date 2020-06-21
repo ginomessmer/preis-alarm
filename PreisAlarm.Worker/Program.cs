@@ -24,6 +24,7 @@ namespace PreisAlarm.Worker
                 .ConfigureServices((hostContext, services) =>
                 {
                     services.AddSingleton<LiteDatabase>(x => new LiteDatabase("data.db"));
+                    services.AddSingleton<IUserService, LiteDbUserService>();
                     services.AddSingleton<EdekaReader>();
 
                     services.AddSingleton<DiscordSocketClient>(x => new DiscordSocketClient());
