@@ -4,32 +4,31 @@ using Discord.Commands;
 using Discord.WebSocket;
 using LiteDB;
 using PreisAlarm.Worker.Data;
+using PreisAlarm.Worker.Services;
 
 namespace PreisAlarm.Worker.Modules
 {
     public class UsersModule : ModuleBase<SocketCommandContext>
     {
-        private readonly LiteDatabase _liteDatabase;
-        public ILiteCollection<FavoriteKeyword> FavoriteKeywords => _liteDatabase.GetCollection<FavoriteKeyword>();
+        private readonly IUserService _userService;
 
-        public UsersModule(LiteDatabase liteDatabase)
+        public UsersModule(IUserService userService)
         {
-            _liteDatabase = liteDatabase;
+            _userService = userService;
         }
 
         [Command("keywords")]
         [Alias("kw")]
-        public async Task ListAllFavoriteKeywordsCommandAsync(SocketGuildUser user = null)
+        public async Task ListAllFavoriteKeywordsCommandAsync(SocketGuildUser user)
         {
-            var keywords = FavoriteKeywords.FindAll();
+            var botUser = await _userService.GetUserAsync(user.Id.ToString());
+            var keywords = botUser.FavoriteKeywords;
+
             if (!keywords.Any())
             {
-                await ReplyAsync("No keywords found. Add new ones with `kw+`.");
+                await ReplyAsync("Es sind bisher noch keine Stichworte vorhanden. Füge welche mit `kw+` hinzu.");
                 return;
             }
-
-            if (user != null)
-                keywords = keywords.Where(x => x.Creator == user.Id.ToString());
 
             await ReplyAsync(string.Join(", ", keywords.Select(x => $"`{x.Text}`")));
         }
@@ -38,24 +37,30 @@ namespace PreisAlarm.Worker.Modules
         [Alias("kw+")]
         public async Task AddFavoriteKeywordCommandAsync(params string[] keywords)
         {
+            var botUser = await _userService.GetUserAsync(Context.User.Id.ToString());
             foreach (var keyword in keywords)
             {
-                FavoriteKeywords.Insert(new FavoriteKeyword
+                botUser.FavoriteKeywords.Add(new FavoriteKeyword
                 {
                     Text = keyword,
                     Creator = Context.User.Id.ToString()
                 });
             }
 
-            await ReplyAsync($"Done.");
+            await _userService.UpdateUserAsync(botUser);
+
+            await ReplyAsync($"Fertig.");
         }
 
         [Command("keywords remove")]
         [Alias("kw-")]
         public async Task RemoveFavoriteKeywordCommandAsync(params string[] keywords)
         {
-            FavoriteKeywords.DeleteMany(x => keywords.Contains(x.Text));
-            await ReplyAsync($"Done.");
+            var botUser = await _userService.GetUserAsync(Context.User.Id.ToString());
+            botUser.FavoriteKeywords.ToList().RemoveAll(x => keywords.Contains(x.Text));
+            await _userService.UpdateUserAsync(botUser);
+
+            await ReplyAsync($"Fertig.");
         }
     }
 }

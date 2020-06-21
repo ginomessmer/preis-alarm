@@ -15,8 +15,17 @@ namespace PreisAlarm.Worker.Services
             _liteDatabase = liteDatabase;
         }
 
-        public Task<BotUser> GetUser(string id) => Task.FromResult(BotUserCollection.FindById(id));
+        public Task<BotUser> GetUserAsync(string id)
+        {
+            var usersExists = BotUserCollection.Exists(x => x.Id == id);
 
-        public Task UpdateUser(BotUser user) => Task.FromResult(BotUserCollection.Update(user));
+            if (!usersExists)
+                BotUserCollection.Insert(new BotUser(id));
+
+            var user = BotUserCollection.FindById(id);
+            return Task.FromResult(user);
+        }
+
+        public Task UpdateUserAsync(BotUser user) => Task.FromResult(BotUserCollection.Update(user));
     }
 }

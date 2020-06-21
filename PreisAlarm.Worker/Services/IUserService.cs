@@ -5,8 +5,18 @@ namespace PreisAlarm.Worker.Services
 {
     public interface IUserService
     {
-        Task<BotUser> GetUser(string id);
+        /// <summary>
+        /// Gets or creates the user with the specified ID.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<BotUser> GetUserAsync(string id);
 
-        Task UpdateUser(BotUser user);
+        /// <summary>
+        /// Updates an existing user.
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
+        Task UpdateUserAsync(BotUser user);
     }
 }
